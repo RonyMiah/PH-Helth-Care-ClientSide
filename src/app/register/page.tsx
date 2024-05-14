@@ -1,45 +1,49 @@
 'use client';
-import {
-  Box,
-  Button,
-  Container,
-  Grid,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Container, Grid, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import assets from '@/assets';
 import Link from 'next/link';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, FieldValues } from 'react-hook-form';
 import { modifyPayload } from '@/utils/modifyPayload';
 import { registerPatient } from '@/services/actions/registerPatient';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { userLogin } from '@/services/actions/userLogin';
 import { storeUserInfo } from '@/services/auth.services';
+import PHForm from '@/components/Froms/PHForms';
+import PHInput from '@/components/Froms/PHInput';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 
-interface PatientRetisterData {
-  password: string;
+export const patientValidationSchema = z.object({
+  password: z.string().min(6, 'Password Mininum 6 Caracter'),
+  patient: z.object({
+    email: z.string().email('Email is required !'),
+    name: z.string().min(1, 'Name is required'),
+    contactNumber: z
+      .string()
+      .regex(/^(01[3-9]\d{8})$/, 'Please Provide a valid phone number '),
+    address: z.string().min(1, 'Address is required !'),
+  }),
+});
+
+export const defatultvalues = {
+  password: '',
   patient: {
-    name: string;
-    email: string;
-    contactNumber: string;
-    address: string;
-  };
-}
+    name: '',
+    email: '',
+    contactNumber: '',
+    address: '',
+  },
+};
 
 const RegisterPage = () => {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<PatientRetisterData>();
+  const [error, setError] = useState('');
 
-  const onSubmit: SubmitHandler<PatientRetisterData> = async (values) => {
+  const registerHandleSubmit: SubmitHandler<FieldValues> = async (values) => {
     const data = modifyPayload(values);
-
     // console.log(values);
 
     try {
@@ -54,8 +58,10 @@ const RegisterPage = () => {
         if (result?.data?.accessToken) {
           toast.success(result?.message);
           storeUserInfo({ accessToken: result?.data?.accessToken });
-          router.push('/');
+          router.push('/dashboard');
         }
+      } else {
+        setError((res.message = 'This User is Already Exists'));
       }
     } catch (error: any) {
       console.log(error);
@@ -96,58 +102,67 @@ const RegisterPage = () => {
               </Typography>
             </Box>
           </Stack>
+          {/* For Error Message show in Server  */}
+          <Box>
+            {error && (
+              <Box>
+                <Typography sx={{ color: 'red', textAlign: 'center' }}>
+                  {error}
+                </Typography>
+              </Box>
+            )}
+          </Box>
 
           <Box>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <PHForm
+              onSubmit={registerHandleSubmit}
+              resolver={zodResolver(patientValidationSchema)}
+              defaultValues={defatultvalues}
+            >
               <Grid container spacing={2} my={1}>
                 <Grid item md={12}>
-                  <TextField
+                  <PHInput
+                    name="patient.name"
                     fullWidth={true}
                     label="Name"
                     type="text"
-                    variant="outlined"
                     size="small"
-                    {...register('patient.name')}
                   />
                 </Grid>
                 <Grid item md={6}>
-                  <TextField
+                  <PHInput
+                    name="patient.email"
                     fullWidth={true}
                     label="Email"
                     type="email"
-                    variant="outlined"
                     size="small"
-                    {...register('patient.email')}
                   />
                 </Grid>
                 <Grid item md={6}>
-                  <TextField
+                  <PHInput
+                    name="password"
                     fullWidth={true}
                     label="Password"
                     type="password"
-                    variant="outlined"
                     size="small"
-                    {...register('password')}
                   />
                 </Grid>
                 <Grid item md={6}>
-                  <TextField
+                  <PHInput
+                    name="patient.contactNumber"
                     fullWidth={true}
                     label="Contact Number"
                     type="tel"
-                    variant="outlined"
                     size="small"
-                    {...register('patient.contactNumber')}
                   />
                 </Grid>
                 <Grid item md={6}>
-                  <TextField
+                  <PHInput
+                    name="patient.address"
                     fullWidth={true}
                     label="Address"
                     type="text"
-                    variant="outlined"
                     size="small"
-                    {...register('patient.address')}
                   />
                 </Grid>
               </Grid>
@@ -166,7 +181,7 @@ const RegisterPage = () => {
                   Login Here
                 </Link>
               </Typography>
-            </form>
+            </PHForm>
           </Box>
         </Box>
       </Stack>
