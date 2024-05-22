@@ -78,7 +78,7 @@ const Specialties = () => {
       </Stack>
       {!isLoading ? (
         <Box mt={2}>
-          <DataGrid rows={data} columns={columns} />
+          <DataGrid rows={data} columns={columns} hideFooter={true} />
         </Box>
       ) : (
         //Loading Component

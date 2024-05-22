@@ -5,7 +5,13 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
-import { Box, DialogContent, DialogTitle, SxProps } from '@mui/material';
+import {
+  Box,
+  DialogContent,
+  DialogTitle,
+  SxProps,
+  Typography,
+} from '@mui/material';
 import { BootstrapDialog } from './ReuseableModal';
 
 const Transition = React.forwardRef(function Transition(
@@ -43,8 +49,7 @@ export default function ReuseableFullScreenModal({
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
-        sx={{background: '#fafafa',
-        boxShadow: 0,}}
+        sx={{ background: '#fafafa', boxShadow: 0 }}
       >
         <AppBar
           sx={{
@@ -52,7 +57,6 @@ export default function ReuseableFullScreenModal({
             left: '96%',
             background: '#fafafa',
             boxShadow: 0,
-            
           }}
         >
           <Toolbar>
@@ -67,7 +71,9 @@ export default function ReuseableFullScreenModal({
           </Toolbar>
         </AppBar>
         <DialogContent dividers>
-          <DialogTitle id="customized-dialog-title">{title}</DialogTitle>
+          <Box>
+            <Typography component='h4' variant='h5' my={1}>{title}</Typography>
+          </Box>
           {children}
         </DialogContent>
       </BootstrapDialog>

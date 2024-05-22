@@ -1,6 +1,7 @@
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 import { USER_ROLE } from './../constants/role';
 import { SvgIconTypeMap } from '@mui/material';
+
 export type IMeta = {
   page: number;
   limit: number;
@@ -32,3 +33,5 @@ export type IGenericErrorMessage = {
   path: string | number;
   message: string;
 };
+
+export const TGender = ['FEMALE', 'MALE'];
